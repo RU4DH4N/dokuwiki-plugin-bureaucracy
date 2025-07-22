@@ -33,10 +33,10 @@ class helper_plugin_bureaucracy_fieldsubmit extends helper_plugin_bureaucracy_fi
     public function renderfield($params, Doku_Form $form, $formid) {
         if(!isset(helper_plugin_bureaucracy_fieldsubmit::$captcha_displayed[$formid])) {
             helper_plugin_bureaucracy_fieldsubmit::$captcha_displayed[$formid] = true;
-            /** @var helper_plugin_captcha $helper */
-            $helper = null;
-            if(@is_dir(DOKU_PLUGIN.'captcha')) $helper = plugin_load('helper','captcha');
-            if(!is_null($helper) && $helper->isEnabled()){
+
+            $captcha = $this->getConf('captchaPlugin') ?: '';
+            $helper = plugin_load('helper', $captcha); // returns PluginInterface|Null
+            if (!is_null($helper) && $helper->isEnabled()) {
                 $form->addElement($helper->getHTML());
             }
         }
@@ -66,9 +66,8 @@ class helper_plugin_bureaucracy_fieldsubmit extends helper_plugin_bureaucracy_fi
         if(!isset(helper_plugin_bureaucracy_fieldsubmit::$captcha_checked[$formid])) {
             helper_plugin_bureaucracy_fieldsubmit::$captcha_checked[$formid] = true;
             // check CAPTCHA
-            /** @var helper_plugin_captcha $helper */
-            $helper = null;
-            if(@is_dir(DOKU_PLUGIN.'captcha')) $helper = plugin_load('helper','captcha');
+            $captcha = $this->getConf('captchaPlugin') ?: '';
+            $helper = plugin_load('helper', $captcha);
             if(!is_null($helper) && $helper->isEnabled()){
                 return $helper->check();
             }
@@ -85,5 +84,4 @@ class helper_plugin_bureaucracy_fieldsubmit extends helper_plugin_bureaucracy_fi
     public function getParam($name) {
         return ($name === 'value') ? null : parent::getParam($name);
     }
-
 }
